@@ -5,7 +5,6 @@
 extern crate pango_sys as ffi;
 #[macro_use]
 extern crate glib;
-#[macro_use]
 extern crate bitflags;
 extern crate libc;
 
