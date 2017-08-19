@@ -2,6 +2,7 @@
 name = "pango"
 version = "0.1.3"
 authors = ["The Gtk-rs Project Developers"]
+readme = "README.md"
 
 description = "Rust bindings for the Pango library"
 repository = "https://github.com/gtk-rs/pango"
@@ -22,6 +23,8 @@ v1_42 = ["v1_38", "pango-sys/v1_42"]
 
 [dependencies]
 libc = "0.2"
-bitflags = "0.5"
+bitflags = "0.9"
 pango-sys = "^0.3.4"
 glib = "^0.1.3"
+glib-sys = "^0.3.4"
+gobject-sys = "^0.3.4"
