@@ -10,11 +10,11 @@ use std::mem;
 use std::ptr;
 
 glib_wrapper! {
-    pub struct EngineShape(Object<ffi::PangoEngineShape, ffi::PangoEngineShapeClass>);
+    pub struct EngineLang(Object<ffi::PangoEngineLang, ffi::PangoEngineLangClass>);
 
     match fn {
-        get_type => || ffi::pango_engine_shape_get_type(),
+        get_type => || ffi::pango_engine_lang_get_type(),
     }
 }
 
-impl EngineShape {}
+impl EngineLang {}
