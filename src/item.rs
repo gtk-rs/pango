@@ -1,57 +1,26 @@
-// Copyright 2015, The Gtk-rs Project Developers.
+// Copyright 2018, The Gtk-rs Project Developers.
 // See the COPYRIGHT file at the top-level directory of this distribution.
 // Licensed under the MIT license, see the LICENSE file or <http://opensource.org/licenses/MIT>
 
-use ffi;
-use libc::c_int;
+use glib::translate::ToGlibPtr;
 
-pub struct Item {
-    pointer: *mut ffi::PangoItem
-}
+use Analysis;
+use Item;
 
 impl Item {
-    pub fn new() -> Option<Item> {
-        let tmp = unsafe { ffi::pango_item_new() };
-
-        if tmp.is_null() {
-            None
-        } else {
-            Some(Item {
-                pointer: tmp
-            })
-        }
+    pub fn offset(&self) -> i32 {
+        unsafe { (*self.to_glib_none().0).offset }
     }
 
-    pub fn copy(&self) -> Option<Item> {
-        let tmp = unsafe { ffi::pango_item_copy(self.pointer) };
-
-        if tmp.is_null() {
-            None
-        } else {
-            Some(Item {
-                pointer: tmp
-            })
-        }
+    pub fn length(&self) -> i32 {
+        unsafe { (*self.to_glib_none().0).length }
     }
 
-    pub fn split(&self, split_index: i32, split_offset: i32) -> Option<Item> {
-        let tmp = unsafe { ffi::pango_item_split(self.pointer, split_index as c_int, split_offset as c_int) };
-
-        if tmp.is_null() {
-            None
-        } else {
-            Some(Item {
-                pointer: tmp
-            })
-        }
+    pub fn num_chars(&self) -> i32 {
+        unsafe { (*self.to_glib_none().0).num_chars }
     }
-}
 
-impl Drop for Item {
-    fn drop(&mut self) {
-        if !self.pointer.is_null() {
-            unsafe { ffi::pango_item_free(self.pointer) };
-            self.pointer = ::std::ptr::null_mut();
-        }
+    pub fn analysis(&self) -> &Analysis {
+        unsafe { &*(&((*self.to_glib_none().0).analysis) as *const _ as *const Analysis) }
     }
 }
