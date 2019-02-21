@@ -17,6 +17,8 @@ use Variant;
 use Weight;
 use ffi;
 use glib;
+use glib::GString;
+use glib::object::IsA;
 use glib::translate::*;
 use std::mem;
 use std::ptr;
@@ -27,14 +29,14 @@ use std::ptr;
 //}
 
 #[cfg_attr(feature = "v1_38", deprecated)]
-pub fn config_key_get(key: &str) -> Option<String> {
+pub fn config_key_get(key: &str) -> Option<GString> {
     unsafe {
         from_glib_full(ffi::pango_config_key_get(key.to_glib_none().0))
     }
 }
 
 #[cfg_attr(feature = "v1_38", deprecated)]
-pub fn config_key_get_system(key: &str) -> Option<String> {
+pub fn config_key_get_system(key: &str) -> Option<GString> {
     unsafe {
         from_glib_full(ffi::pango_config_key_get_system(key.to_glib_none().0))
     }
@@ -75,7 +77,7 @@ pub fn find_paragraph_boundary(text: &str) -> (i32, i32) {
 }
 
 #[cfg_attr(feature = "v1_38", deprecated)]
-pub fn get_lib_subdirectory() -> Option<String> {
+pub fn get_lib_subdirectory() -> Option<GString> {
     unsafe {
         from_glib_none(ffi::pango_get_lib_subdirectory())
     }
@@ -86,7 +88,7 @@ pub fn get_lib_subdirectory() -> Option<String> {
 //}
 
 #[cfg_attr(feature = "v1_38", deprecated)]
-pub fn get_sysconf_subdirectory() -> Option<String> {
+pub fn get_sysconf_subdirectory() -> Option<GString> {
     unsafe {
         from_glib_none(ffi::pango_get_sysconf_subdirectory())
     }
@@ -98,36 +100,24 @@ pub fn is_zero_width(ch: char) -> bool {
     }
 }
 
-pub fn itemize<'a, P: Into<Option<&'a AttrIterator>>>(context: &Context, text: &str, start_index: i32, length: i32, attrs: &AttrList, cached_iter: P) -> Vec<Item> {
+pub fn itemize<'a, P: IsA<Context>, Q: Into<Option<&'a AttrIterator>>>(context: &P, text: &str, start_index: i32, length: i32, attrs: &AttrList, cached_iter: Q) -> Vec<Item> {
     let cached_iter = cached_iter.into();
     unsafe {
-        FromGlibPtrContainer::from_glib_full(ffi::pango_itemize(context.to_glib_none().0, text.to_glib_none().0, start_index, length, attrs.to_glib_none().0, mut_override(cached_iter.to_glib_none().0)))
+        FromGlibPtrContainer::from_glib_full(ffi::pango_itemize(context.as_ref().to_glib_none().0, text.to_glib_none().0, start_index, length, attrs.to_glib_none().0, mut_override(cached_iter.to_glib_none().0)))
     }
 }
 
-pub fn itemize_with_base_dir<'a, P: Into<Option<&'a AttrIterator>>>(context: &Context, base_dir: Direction, text: &str, start_index: i32, length: i32, attrs: &AttrList, cached_iter: P) -> Vec<Item> {
+pub fn itemize_with_base_dir<'a, P: IsA<Context>, Q: Into<Option<&'a AttrIterator>>>(context: &P, base_dir: Direction, text: &str, start_index: i32, length: i32, attrs: &AttrList, cached_iter: Q) -> Vec<Item> {
     let cached_iter = cached_iter.into();
     unsafe {
-        FromGlibPtrContainer::from_glib_full(ffi::pango_itemize_with_base_dir(context.to_glib_none().0, base_dir.to_glib(), text.to_glib_none().0, start_index, length, attrs.to_glib_none().0, mut_override(cached_iter.to_glib_none().0)))
+        FromGlibPtrContainer::from_glib_full(ffi::pango_itemize_with_base_dir(context.as_ref().to_glib_none().0, base_dir.to_glib(), text.to_glib_none().0, start_index, length, attrs.to_glib_none().0, mut_override(cached_iter.to_glib_none().0)))
     }
 }
 
-#[cfg_attr(feature = "v1_32", deprecated)]
-pub fn lookup_aliases(fontname: &str) -> Vec<String> {
-    unsafe {
-        let mut families = ptr::null_mut();
-        let mut n_families = mem::uninitialized();
-        ffi::pango_lookup_aliases(fontname.to_glib_none().0, &mut families, &mut n_families);
-        FromGlibContainer::from_glib_full_num(families, n_families as usize)
-    }
-}
-
-//#[cfg(any(feature = "v1_31", feature = "dox"))]
-//pub fn markup_parser_finish(context: /*Ignored*/&glib::MarkupParseContext) -> Result<(AttrList, String, char), Error> {
+//pub fn markup_parser_finish(context: /*Ignored*/&glib::MarkupParseContext) -> Result<(AttrList, GString, char), Error> {
 //    unsafe { TODO: call ffi::pango_markup_parser_finish() }
 //}
 
-//#[cfg(any(feature = "v1_31", feature = "dox"))]
 //pub fn markup_parser_new(accel_marker: char) -> /*Ignored*/Option<glib::MarkupParseContext> {
 //    unsafe { TODO: call ffi::pango_markup_parser_new() }
 //}
@@ -138,18 +128,17 @@ pub fn lookup_aliases(fontname: &str) -> Vec<String> {
 //}
 
 #[cfg_attr(feature = "v1_38", deprecated)]
-pub fn parse_enum<'a, P: Into<Option<&'a str>>>(type_: glib::types::Type, str: P, warn: bool) -> Option<(i32, String)> {
+pub fn parse_enum<'a, P: Into<Option<&'a str>>>(type_: glib::types::Type, str: P, warn: bool) -> Option<(i32, GString)> {
     let str = str.into();
-    let str = str.to_glib_none();
     unsafe {
         let mut value = mem::uninitialized();
         let mut possible_values = ptr::null_mut();
-        let ret = from_glib(ffi::pango_parse_enum(type_.to_glib(), str.0, &mut value, warn.to_glib(), &mut possible_values));
+        let ret = from_glib(ffi::pango_parse_enum(type_.to_glib(), str.to_glib_none().0, &mut value, warn.to_glib(), &mut possible_values));
         if ret { Some((value, from_glib_full(possible_values))) } else { None }
     }
 }
 
-pub fn parse_markup(markup_text: &str, accel_marker: char) -> Result<(AttrList, String, char), Error> {
+pub fn parse_markup(markup_text: &str, accel_marker: char) -> Result<(AttrList, GString, char), Error> {
     let length = markup_text.len() as i32;
     unsafe {
         let mut attr_list = ptr::null_mut();
@@ -200,22 +189,22 @@ pub fn quantize_line_geometry(thickness: &mut i32, position: &mut i32) {
 }
 
 //#[cfg_attr(feature = "v1_38", deprecated)]
-//pub fn read_line<P: Into<Option</*Unimplemented*/Fundamental: Pointer>>>(stream: P, str: /*Ignored*/glib::String) -> i32 {
+//pub fn read_line(stream: /*Unimplemented*/Option<Fundamental: Pointer>, str: /*Ignored*/glib::String) -> i32 {
 //    unsafe { TODO: call ffi::pango_read_line() }
 //}
 
 //#[cfg_attr(feature = "v1_38", deprecated)]
-//pub fn scan_int(pos: /*Unimplemented*/String) -> Option<i32> {
+//pub fn scan_int(pos: /*Unimplemented*/GString) -> Option<i32> {
 //    unsafe { TODO: call ffi::pango_scan_int() }
 //}
 
 //#[cfg_attr(feature = "v1_38", deprecated)]
-//pub fn scan_string(pos: /*Unimplemented*/String, out: /*Ignored*/glib::String) -> bool {
+//pub fn scan_string(pos: /*Unimplemented*/GString, out: /*Ignored*/glib::String) -> bool {
 //    unsafe { TODO: call ffi::pango_scan_string() }
 //}
 
 //#[cfg_attr(feature = "v1_38", deprecated)]
-//pub fn scan_word(pos: /*Unimplemented*/String, out: /*Ignored*/glib::String) -> bool {
+//pub fn scan_word(pos: /*Unimplemented*/GString, out: /*Ignored*/glib::String) -> bool {
 //    unsafe { TODO: call ffi::pango_scan_word() }
 //}
 
@@ -227,19 +216,19 @@ pub fn shape(text: &str, analysis: &Analysis, glyphs: &mut GlyphString) {
 }
 
 //#[cfg_attr(feature = "v1_38", deprecated)]
-//pub fn skip_space(pos: /*Unimplemented*/String) -> bool {
+//pub fn skip_space(pos: /*Unimplemented*/GString) -> bool {
 //    unsafe { TODO: call ffi::pango_skip_space() }
 //}
 
 #[cfg_attr(feature = "v1_38", deprecated)]
-pub fn split_file_list(str: &str) -> Vec<String> {
+pub fn split_file_list(str: &str) -> Vec<GString> {
     unsafe {
         FromGlibPtrContainer::from_glib_full(ffi::pango_split_file_list(str.to_glib_none().0))
     }
 }
 
 #[cfg_attr(feature = "v1_38", deprecated)]
-pub fn trim_string(str: &str) -> Option<String> {
+pub fn trim_string(str: &str) -> Option<GString> {
     unsafe {
         from_glib_full(ffi::pango_trim_string(str.to_glib_none().0))
     }
@@ -269,13 +258,13 @@ pub fn version() -> i32 {
     }
 }
 
-pub fn version_check(required_major: i32, required_minor: i32, required_micro: i32) -> Option<String> {
+pub fn version_check(required_major: i32, required_minor: i32, required_micro: i32) -> Option<GString> {
     unsafe {
         from_glib_none(ffi::pango_version_check(required_major, required_minor, required_micro))
     }
 }
 
-pub fn version_string() -> Option<String> {
+pub fn version_string() -> Option<GString> {
     unsafe {
         from_glib_none(ffi::pango_version_string())
     }

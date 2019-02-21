@@ -4,23 +4,25 @@
 
 use FontFace;
 use ffi;
+use glib::GString;
 use glib::object::IsA;
 use glib::translate::*;
-use glib_ffi;
-use gobject_ffi;
+use std::fmt;
 use std::mem;
 use std::ptr;
 
 glib_wrapper! {
-    pub struct FontFamily(Object<ffi::PangoFontFamily, ffi::PangoFontFamilyClass>);
+    pub struct FontFamily(Object<ffi::PangoFontFamily, ffi::PangoFontFamilyClass, FontFamilyClass>);
 
     match fn {
         get_type => || ffi::pango_font_family_get_type(),
     }
 }
 
-pub trait FontFamilyExt {
-    fn get_name(&self) -> Option<String>;
+pub const NONE_FONT_FAMILY: Option<&FontFamily> = None;
+
+pub trait FontFamilyExt: 'static {
+    fn get_name(&self) -> Option<GString>;
 
     fn is_monospace(&self) -> bool;
 
@@ -28,15 +30,15 @@ pub trait FontFamilyExt {
 }
 
 impl<O: IsA<FontFamily>> FontFamilyExt for O {
-    fn get_name(&self) -> Option<String> {
+    fn get_name(&self) -> Option<GString> {
         unsafe {
-            from_glib_none(ffi::pango_font_family_get_name(self.to_glib_none().0))
+            from_glib_none(ffi::pango_font_family_get_name(self.as_ref().to_glib_none().0))
         }
     }
 
     fn is_monospace(&self) -> bool {
         unsafe {
-            from_glib(ffi::pango_font_family_is_monospace(self.to_glib_none().0))
+            from_glib(ffi::pango_font_family_is_monospace(self.as_ref().to_glib_none().0))
         }
     }
 
@@ -44,8 +46,14 @@ impl<O: IsA<FontFamily>> FontFamilyExt for O {
         unsafe {
             let mut faces = ptr::null_mut();
             let mut n_faces = mem::uninitialized();
-            ffi::pango_font_family_list_faces(self.to_glib_none().0, &mut faces, &mut n_faces);
+            ffi::pango_font_family_list_faces(self.as_ref().to_glib_none().0, &mut faces, &mut n_faces);
             FromGlibContainer::from_glib_container_num(faces, n_faces as usize)
         }
+    }
+}
+
+impl fmt::Display for FontFamily {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "FontFamily")
     }
 }

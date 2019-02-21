@@ -8,13 +8,10 @@ use Language;
 use ffi;
 use glib::object::IsA;
 use glib::translate::*;
-use glib_ffi;
-use gobject_ffi;
-use std::mem;
-use std::ptr;
+use std::fmt;
 
 glib_wrapper! {
-    pub struct FontsetSimple(Object<ffi::PangoFontsetSimple, ffi::PangoFontsetSimpleClass>): Fontset;
+    pub struct FontsetSimple(Object<ffi::PangoFontsetSimple, ffi::PangoFontsetSimpleClass, FontsetSimpleClass>) @extends Fontset;
 
     match fn {
         get_type => || ffi::pango_fontset_simple_get_type(),
@@ -29,22 +26,30 @@ impl FontsetSimple {
     }
 }
 
-pub trait FontsetSimpleExt {
-    fn append(&self, font: &Font);
+pub const NONE_FONTSET_SIMPLE: Option<&FontsetSimple> = None;
+
+pub trait FontsetSimpleExt: 'static {
+    fn append<P: IsA<Font>>(&self, font: &P);
 
     fn size(&self) -> i32;
 }
 
 impl<O: IsA<FontsetSimple>> FontsetSimpleExt for O {
-    fn append(&self, font: &Font) {
+    fn append<P: IsA<Font>>(&self, font: &P) {
         unsafe {
-            ffi::pango_fontset_simple_append(self.to_glib_none().0, font.to_glib_none().0);
+            ffi::pango_fontset_simple_append(self.as_ref().to_glib_none().0, font.as_ref().to_glib_none().0);
         }
     }
 
     fn size(&self) -> i32 {
         unsafe {
-            ffi::pango_fontset_simple_size(self.to_glib_none().0)
+            ffi::pango_fontset_simple_size(self.as_ref().to_glib_none().0)
         }
+    }
+}
+
+impl fmt::Display for FontsetSimple {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "FontsetSimple")
     }
 }
