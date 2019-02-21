@@ -9,13 +9,10 @@ use Style;
 use Variant;
 use Weight;
 use ffi;
+use glib::GString;
 use glib::translate::*;
-use glib_ffi;
-use gobject_ffi;
 use std::fmt;
 use std::hash;
-use std::mem;
-use std::ptr;
 
 glib_wrapper! {
     #[derive(Debug, PartialOrd, Ord)]
@@ -37,9 +34,8 @@ impl FontDescription {
 
     pub fn better_match<'a, P: Into<Option<&'a FontDescription>>>(&self, old_match: P, new_match: &FontDescription) -> bool {
         let old_match = old_match.into();
-        let old_match = old_match.to_glib_none();
         unsafe {
-            from_glib(ffi::pango_font_description_better_match(self.to_glib_none().0, old_match.0, new_match.to_glib_none().0))
+            from_glib(ffi::pango_font_description_better_match(self.to_glib_none().0, old_match.to_glib_none().0, new_match.to_glib_none().0))
         }
     }
 
@@ -49,7 +45,7 @@ impl FontDescription {
         }
     }
 
-    pub fn get_family(&self) -> Option<String> {
+    pub fn get_family(&self) -> Option<GString> {
         unsafe {
             from_glib_none(ffi::pango_font_description_get_family(self.to_glib_none().0))
         }
@@ -97,6 +93,13 @@ impl FontDescription {
         }
     }
 
+    #[cfg(any(feature = "v1_42", feature = "dox"))]
+    pub fn get_variations(&self) -> Option<GString> {
+        unsafe {
+            from_glib_none(ffi::pango_font_description_get_variations(self.to_glib_none().0))
+        }
+    }
+
     pub fn get_weight(&self) -> Weight {
         unsafe {
             from_glib(ffi::pango_font_description_get_weight(self.to_glib_none().0))
@@ -111,9 +114,8 @@ impl FontDescription {
 
     pub fn merge<'a, P: Into<Option<&'a FontDescription>>>(&mut self, desc_to_merge: P, replace_existing: bool) {
         let desc_to_merge = desc_to_merge.into();
-        let desc_to_merge = desc_to_merge.to_glib_none();
         unsafe {
-            ffi::pango_font_description_merge(self.to_glib_none_mut().0, desc_to_merge.0, replace_existing.to_glib());
+            ffi::pango_font_description_merge(self.to_glib_none_mut().0, desc_to_merge.to_glib_none().0, replace_existing.to_glib());
         }
     }
 
@@ -159,19 +161,33 @@ impl FontDescription {
         }
     }
 
+    #[cfg(any(feature = "v1_42", feature = "dox"))]
+    pub fn set_variations(&mut self, settings: &str) {
+        unsafe {
+            ffi::pango_font_description_set_variations(self.to_glib_none_mut().0, settings.to_glib_none().0);
+        }
+    }
+
+    #[cfg(any(feature = "v1_42", feature = "dox"))]
+    pub fn set_variations_static(&mut self, settings: &str) {
+        unsafe {
+            ffi::pango_font_description_set_variations_static(self.to_glib_none_mut().0, settings.to_glib_none().0);
+        }
+    }
+
     pub fn set_weight(&mut self, weight: Weight) {
         unsafe {
             ffi::pango_font_description_set_weight(self.to_glib_none_mut().0, weight.to_glib());
         }
     }
 
-    pub fn to_filename(&self) -> Option<String> {
+    pub fn to_filename(&self) -> Option<GString> {
         unsafe {
             from_glib_full(ffi::pango_font_description_to_filename(self.to_glib_none().0))
         }
     }
 
-    fn to_string(&self) -> String {
+    fn to_string(&self) -> GString {
         unsafe {
             from_glib_full(ffi::pango_font_description_to_string(self.to_glib_none().0))
         }

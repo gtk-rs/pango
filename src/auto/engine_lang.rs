@@ -4,13 +4,10 @@
 
 use ffi;
 use glib::translate::*;
-use glib_ffi;
-use gobject_ffi;
-use std::mem;
-use std::ptr;
+use std::fmt;
 
 glib_wrapper! {
-    pub struct EngineLang(Object<ffi::PangoEngineLang, ffi::PangoEngineLangClass>);
+    pub struct EngineLang(Object<ffi::PangoEngineLang, ffi::PangoEngineLangClass, EngineLangClass>);
 
     match fn {
         get_type => || ffi::pango_engine_lang_get_type(),
@@ -18,3 +15,11 @@ glib_wrapper! {
 }
 
 impl EngineLang {}
+
+pub const NONE_ENGINE_LANG: Option<&EngineLang> = None;
+
+impl fmt::Display for EngineLang {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "EngineLang")
+    }
+}

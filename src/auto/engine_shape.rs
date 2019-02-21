@@ -4,13 +4,10 @@
 
 use ffi;
 use glib::translate::*;
-use glib_ffi;
-use gobject_ffi;
-use std::mem;
-use std::ptr;
+use std::fmt;
 
 glib_wrapper! {
-    pub struct EngineShape(Object<ffi::PangoEngineShape, ffi::PangoEngineShapeClass>);
+    pub struct EngineShape(Object<ffi::PangoEngineShape, ffi::PangoEngineShapeClass, EngineShapeClass>);
 
     match fn {
         get_type => || ffi::pango_engine_shape_get_type(),
@@ -18,3 +15,11 @@ glib_wrapper! {
 }
 
 impl EngineShape {}
+
+pub const NONE_ENGINE_SHAPE: Option<&EngineShape> = None;
+
+impl fmt::Display for EngineShape {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "EngineShape")
+    }
+}
