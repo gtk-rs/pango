@@ -2,72 +2,99 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
+use glib::object::IsA;
+use glib::translate::*;
+use pango_sys;
+use std::mem;
 use Analysis;
 use Font;
 use Rectangle;
-use ffi;
-use glib::object::IsA;
-use glib::translate::*;
-use std::mem;
 
 glib_wrapper! {
     #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-    pub struct GlyphString(Boxed<ffi::PangoGlyphString>);
+    pub struct GlyphString(Boxed<pango_sys::PangoGlyphString>);
 
     match fn {
-        copy => |ptr| ffi::pango_glyph_string_copy(mut_override(ptr)),
-        free => |ptr| ffi::pango_glyph_string_free(ptr),
-        get_type => || ffi::pango_glyph_string_get_type(),
+        copy => |ptr| pango_sys::pango_glyph_string_copy(mut_override(ptr)),
+        free => |ptr| pango_sys::pango_glyph_string_free(ptr),
+        get_type => || pango_sys::pango_glyph_string_get_type(),
     }
 }
 
 impl GlyphString {
     pub fn new() -> GlyphString {
-        unsafe {
-            from_glib_full(ffi::pango_glyph_string_new())
-        }
+        unsafe { from_glib_full(pango_sys::pango_glyph_string_new()) }
     }
 
     pub fn extents<P: IsA<Font>>(&mut self, font: &P) -> (Rectangle, Rectangle) {
         unsafe {
             let mut ink_rect = Rectangle::uninitialized();
             let mut logical_rect = Rectangle::uninitialized();
-            ffi::pango_glyph_string_extents(self.to_glib_none_mut().0, font.as_ref().to_glib_none().0, ink_rect.to_glib_none_mut().0, logical_rect.to_glib_none_mut().0);
+            pango_sys::pango_glyph_string_extents(
+                self.to_glib_none_mut().0,
+                font.as_ref().to_glib_none().0,
+                ink_rect.to_glib_none_mut().0,
+                logical_rect.to_glib_none_mut().0,
+            );
             (ink_rect, logical_rect)
         }
     }
 
-    pub fn extents_range<P: IsA<Font>>(&mut self, start: i32, end: i32, font: &P) -> (Rectangle, Rectangle) {
+    pub fn extents_range<P: IsA<Font>>(
+        &mut self,
+        start: i32,
+        end: i32,
+        font: &P,
+    ) -> (Rectangle, Rectangle) {
         unsafe {
             let mut ink_rect = Rectangle::uninitialized();
             let mut logical_rect = Rectangle::uninitialized();
-            ffi::pango_glyph_string_extents_range(self.to_glib_none_mut().0, start, end, font.as_ref().to_glib_none().0, ink_rect.to_glib_none_mut().0, logical_rect.to_glib_none_mut().0);
+            pango_sys::pango_glyph_string_extents_range(
+                self.to_glib_none_mut().0,
+                start,
+                end,
+                font.as_ref().to_glib_none().0,
+                ink_rect.to_glib_none_mut().0,
+                logical_rect.to_glib_none_mut().0,
+            );
             (ink_rect, logical_rect)
         }
     }
 
     //pub fn get_logical_widths(&mut self, text: &str, embedding_level: i32, logical_widths: &[i32]) {
-    //    unsafe { TODO: call ffi::pango_glyph_string_get_logical_widths() }
+    //    unsafe { TODO: call pango_sys:pango_glyph_string_get_logical_widths() }
     //}
 
     pub fn get_width(&mut self) -> i32 {
-        unsafe {
-            ffi::pango_glyph_string_get_width(self.to_glib_none_mut().0)
-        }
+        unsafe { pango_sys::pango_glyph_string_get_width(self.to_glib_none_mut().0) }
     }
 
-    pub fn index_to_x(&mut self, text: &str, analysis: &mut Analysis, index_: i32, trailing: bool) -> i32 {
+    pub fn index_to_x(
+        &mut self,
+        text: &str,
+        analysis: &mut Analysis,
+        index_: i32,
+        trailing: bool,
+    ) -> i32 {
         let length = text.len() as i32;
         unsafe {
             let mut x_pos = mem::uninitialized();
-            ffi::pango_glyph_string_index_to_x(self.to_glib_none_mut().0, text.to_glib_none().0, length, analysis.to_glib_none_mut().0, index_, trailing.to_glib(), &mut x_pos);
+            pango_sys::pango_glyph_string_index_to_x(
+                self.to_glib_none_mut().0,
+                text.to_glib_none().0,
+                length,
+                analysis.to_glib_none_mut().0,
+                index_,
+                trailing.to_glib(),
+                &mut x_pos,
+            );
             x_pos
         }
     }
 
     pub fn set_size(&mut self, new_len: i32) {
         unsafe {
-            ffi::pango_glyph_string_set_size(self.to_glib_none_mut().0, new_len);
+            pango_sys::pango_glyph_string_set_size(self.to_glib_none_mut().0, new_len);
         }
     }
 
@@ -76,7 +103,15 @@ impl GlyphString {
         unsafe {
             let mut index_ = mem::uninitialized();
             let mut trailing = mem::uninitialized();
-            ffi::pango_glyph_string_x_to_index(self.to_glib_none_mut().0, text.to_glib_none().0, length, analysis.to_glib_none_mut().0, x_pos, &mut index_, &mut trailing);
+            pango_sys::pango_glyph_string_x_to_index(
+                self.to_glib_none_mut().0,
+                text.to_glib_none().0,
+                length,
+                analysis.to_glib_none_mut().0,
+                x_pos,
+                &mut index_,
+                &mut trailing,
+            );
             (index_, trailing)
         }
     }
