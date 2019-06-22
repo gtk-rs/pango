@@ -2,6 +2,10 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
+use glib::object::IsA;
+use glib::translate::*;
+use pango_sys;
+use std::fmt;
 use Color;
 use Font;
 use Glyph;
@@ -11,16 +15,12 @@ use Layout;
 use LayoutLine;
 use Matrix;
 use RenderPart;
-use ffi;
-use glib::object::IsA;
-use glib::translate::*;
-use std::fmt;
 
 glib_wrapper! {
-    pub struct Renderer(Object<ffi::PangoRenderer, ffi::PangoRendererClass, RendererClass>);
+    pub struct Renderer(Object<pango_sys::PangoRenderer, pango_sys::PangoRendererClass, RendererClass>);
 
     match fn {
-        get_type => || ffi::pango_renderer_get_type(),
+        get_type => || pango_sys::pango_renderer_get_type(),
     }
 }
 
@@ -35,17 +35,26 @@ pub trait RendererExt: 'static {
 
     fn draw_glyph<P: IsA<Font>>(&self, font: &P, glyph: Glyph, x: f64, y: f64);
 
-    fn draw_glyph_item<'a, P: Into<Option<&'a str>>>(&self, text: P, glyph_item: &mut GlyphItem, x: i32, y: i32);
+    fn draw_glyph_item(&self, text: Option<&str>, glyph_item: &mut GlyphItem, x: i32, y: i32);
 
     fn draw_glyphs<P: IsA<Font>>(&self, font: &P, glyphs: &mut GlyphString, x: i32, y: i32);
 
-    fn draw_layout<P: IsA<Layout>>(&self, layout: &P, x: i32, y: i32);
+    fn draw_layout(&self, layout: &Layout, x: i32, y: i32);
 
     fn draw_layout_line(&self, line: &LayoutLine, x: i32, y: i32);
 
     fn draw_rectangle(&self, part: RenderPart, x: i32, y: i32, width: i32, height: i32);
 
-    fn draw_trapezoid(&self, part: RenderPart, y1_: f64, x11: f64, x21: f64, y2: f64, x12: f64, x22: f64);
+    fn draw_trapezoid(
+        &self,
+        part: RenderPart,
+        y1_: f64,
+        x11: f64,
+        x21: f64,
+        y2: f64,
+        x12: f64,
+        x22: f64,
+    );
 
     #[cfg(any(feature = "v1_38", feature = "dox"))]
     fn get_alpha(&self, part: RenderPart) -> u16;
@@ -63,128 +72,204 @@ pub trait RendererExt: 'static {
     #[cfg(any(feature = "v1_38", feature = "dox"))]
     fn set_alpha(&self, part: RenderPart, alpha: u16);
 
-    fn set_color<'a, P: Into<Option<&'a Color>>>(&self, part: RenderPart, color: P);
+    fn set_color(&self, part: RenderPart, color: Option<&Color>);
 
-    fn set_matrix<'a, P: Into<Option<&'a Matrix>>>(&self, matrix: P);
+    fn set_matrix(&self, matrix: Option<&Matrix>);
 }
 
 impl<O: IsA<Renderer>> RendererExt for O {
     fn activate(&self) {
         unsafe {
-            ffi::pango_renderer_activate(self.as_ref().to_glib_none().0);
+            pango_sys::pango_renderer_activate(self.as_ref().to_glib_none().0);
         }
     }
 
     fn deactivate(&self) {
         unsafe {
-            ffi::pango_renderer_deactivate(self.as_ref().to_glib_none().0);
+            pango_sys::pango_renderer_deactivate(self.as_ref().to_glib_none().0);
         }
     }
 
     fn draw_error_underline(&self, x: i32, y: i32, width: i32, height: i32) {
         unsafe {
-            ffi::pango_renderer_draw_error_underline(self.as_ref().to_glib_none().0, x, y, width, height);
+            pango_sys::pango_renderer_draw_error_underline(
+                self.as_ref().to_glib_none().0,
+                x,
+                y,
+                width,
+                height,
+            );
         }
     }
 
     fn draw_glyph<P: IsA<Font>>(&self, font: &P, glyph: Glyph, x: f64, y: f64) {
         unsafe {
-            ffi::pango_renderer_draw_glyph(self.as_ref().to_glib_none().0, font.as_ref().to_glib_none().0, glyph, x, y);
+            pango_sys::pango_renderer_draw_glyph(
+                self.as_ref().to_glib_none().0,
+                font.as_ref().to_glib_none().0,
+                glyph,
+                x,
+                y,
+            );
         }
     }
 
-    fn draw_glyph_item<'a, P: Into<Option<&'a str>>>(&self, text: P, glyph_item: &mut GlyphItem, x: i32, y: i32) {
-        let text = text.into();
+    fn draw_glyph_item(&self, text: Option<&str>, glyph_item: &mut GlyphItem, x: i32, y: i32) {
         unsafe {
-            ffi::pango_renderer_draw_glyph_item(self.as_ref().to_glib_none().0, text.to_glib_none().0, glyph_item.to_glib_none_mut().0, x, y);
+            pango_sys::pango_renderer_draw_glyph_item(
+                self.as_ref().to_glib_none().0,
+                text.to_glib_none().0,
+                glyph_item.to_glib_none_mut().0,
+                x,
+                y,
+            );
         }
     }
 
     fn draw_glyphs<P: IsA<Font>>(&self, font: &P, glyphs: &mut GlyphString, x: i32, y: i32) {
         unsafe {
-            ffi::pango_renderer_draw_glyphs(self.as_ref().to_glib_none().0, font.as_ref().to_glib_none().0, glyphs.to_glib_none_mut().0, x, y);
+            pango_sys::pango_renderer_draw_glyphs(
+                self.as_ref().to_glib_none().0,
+                font.as_ref().to_glib_none().0,
+                glyphs.to_glib_none_mut().0,
+                x,
+                y,
+            );
         }
     }
 
-    fn draw_layout<P: IsA<Layout>>(&self, layout: &P, x: i32, y: i32) {
+    fn draw_layout(&self, layout: &Layout, x: i32, y: i32) {
         unsafe {
-            ffi::pango_renderer_draw_layout(self.as_ref().to_glib_none().0, layout.as_ref().to_glib_none().0, x, y);
+            pango_sys::pango_renderer_draw_layout(
+                self.as_ref().to_glib_none().0,
+                layout.to_glib_none().0,
+                x,
+                y,
+            );
         }
     }
 
     fn draw_layout_line(&self, line: &LayoutLine, x: i32, y: i32) {
         unsafe {
-            ffi::pango_renderer_draw_layout_line(self.as_ref().to_glib_none().0, line.to_glib_none().0, x, y);
+            pango_sys::pango_renderer_draw_layout_line(
+                self.as_ref().to_glib_none().0,
+                line.to_glib_none().0,
+                x,
+                y,
+            );
         }
     }
 
     fn draw_rectangle(&self, part: RenderPart, x: i32, y: i32, width: i32, height: i32) {
         unsafe {
-            ffi::pango_renderer_draw_rectangle(self.as_ref().to_glib_none().0, part.to_glib(), x, y, width, height);
+            pango_sys::pango_renderer_draw_rectangle(
+                self.as_ref().to_glib_none().0,
+                part.to_glib(),
+                x,
+                y,
+                width,
+                height,
+            );
         }
     }
 
-    fn draw_trapezoid(&self, part: RenderPart, y1_: f64, x11: f64, x21: f64, y2: f64, x12: f64, x22: f64) {
+    fn draw_trapezoid(
+        &self,
+        part: RenderPart,
+        y1_: f64,
+        x11: f64,
+        x21: f64,
+        y2: f64,
+        x12: f64,
+        x22: f64,
+    ) {
         unsafe {
-            ffi::pango_renderer_draw_trapezoid(self.as_ref().to_glib_none().0, part.to_glib(), y1_, x11, x21, y2, x12, x22);
+            pango_sys::pango_renderer_draw_trapezoid(
+                self.as_ref().to_glib_none().0,
+                part.to_glib(),
+                y1_,
+                x11,
+                x21,
+                y2,
+                x12,
+                x22,
+            );
         }
     }
 
     #[cfg(any(feature = "v1_38", feature = "dox"))]
     fn get_alpha(&self, part: RenderPart) -> u16 {
         unsafe {
-            ffi::pango_renderer_get_alpha(self.as_ref().to_glib_none().0, part.to_glib())
+            pango_sys::pango_renderer_get_alpha(self.as_ref().to_glib_none().0, part.to_glib())
         }
     }
 
     fn get_color(&self, part: RenderPart) -> Option<Color> {
         unsafe {
-            from_glib_none(ffi::pango_renderer_get_color(self.as_ref().to_glib_none().0, part.to_glib()))
+            from_glib_none(pango_sys::pango_renderer_get_color(
+                self.as_ref().to_glib_none().0,
+                part.to_glib(),
+            ))
         }
     }
 
     fn get_layout(&self) -> Option<Layout> {
         unsafe {
-            from_glib_none(ffi::pango_renderer_get_layout(self.as_ref().to_glib_none().0))
+            from_glib_none(pango_sys::pango_renderer_get_layout(
+                self.as_ref().to_glib_none().0,
+            ))
         }
     }
 
     fn get_layout_line(&self) -> Option<LayoutLine> {
         unsafe {
-            from_glib_none(ffi::pango_renderer_get_layout_line(self.as_ref().to_glib_none().0))
+            from_glib_none(pango_sys::pango_renderer_get_layout_line(
+                self.as_ref().to_glib_none().0,
+            ))
         }
     }
 
     fn get_matrix(&self) -> Option<Matrix> {
         unsafe {
-            from_glib_none(ffi::pango_renderer_get_matrix(self.as_ref().to_glib_none().0))
+            from_glib_none(pango_sys::pango_renderer_get_matrix(
+                self.as_ref().to_glib_none().0,
+            ))
         }
     }
 
     fn part_changed(&self, part: RenderPart) {
         unsafe {
-            ffi::pango_renderer_part_changed(self.as_ref().to_glib_none().0, part.to_glib());
+            pango_sys::pango_renderer_part_changed(self.as_ref().to_glib_none().0, part.to_glib());
         }
     }
 
     #[cfg(any(feature = "v1_38", feature = "dox"))]
     fn set_alpha(&self, part: RenderPart, alpha: u16) {
         unsafe {
-            ffi::pango_renderer_set_alpha(self.as_ref().to_glib_none().0, part.to_glib(), alpha);
+            pango_sys::pango_renderer_set_alpha(
+                self.as_ref().to_glib_none().0,
+                part.to_glib(),
+                alpha,
+            );
         }
     }
 
-    fn set_color<'a, P: Into<Option<&'a Color>>>(&self, part: RenderPart, color: P) {
-        let color = color.into();
+    fn set_color(&self, part: RenderPart, color: Option<&Color>) {
         unsafe {
-            ffi::pango_renderer_set_color(self.as_ref().to_glib_none().0, part.to_glib(), color.to_glib_none().0);
+            pango_sys::pango_renderer_set_color(
+                self.as_ref().to_glib_none().0,
+                part.to_glib(),
+                color.to_glib_none().0,
+            );
         }
     }
 
-    fn set_matrix<'a, P: Into<Option<&'a Matrix>>>(&self, matrix: P) {
-        let matrix = matrix.into();
+    fn set_matrix(&self, matrix: Option<&Matrix>) {
         unsafe {
-            ffi::pango_renderer_set_matrix(self.as_ref().to_glib_none().0, matrix.to_glib_none().0);
+            pango_sys::pango_renderer_set_matrix(
+                self.as_ref().to_glib_none().0,
+                matrix.to_glib_none().0,
+            );
         }
     }
 }

@@ -2,6 +2,10 @@
 // from gir-files (https://github.com/gtk-rs/gir-files)
 // DO NOT EDIT
 
+use glib::object::IsA;
+use glib::translate::*;
+use pango_sys;
+use std::fmt;
 use Coverage;
 use EngineShape;
 use FontDescription;
@@ -10,16 +14,12 @@ use FontMetrics;
 use Glyph;
 use Language;
 use Rectangle;
-use ffi;
-use glib::object::IsA;
-use glib::translate::*;
-use std::fmt;
 
 glib_wrapper! {
-    pub struct Font(Object<ffi::PangoFont, ffi::PangoFontClass, FontClass>);
+    pub struct Font(Object<pango_sys::PangoFont, pango_sys::PangoFontClass, FontClass>);
 
     match fn {
-        get_type => || ffi::pango_font_get_type(),
+        get_type => || pango_sys::pango_font_get_type(),
     }
 }
 
@@ -38,37 +38,50 @@ pub trait FontExt: 'static {
 
     fn get_glyph_extents(&self, glyph: Glyph) -> (Rectangle, Rectangle);
 
-    fn get_metrics<'a, P: Into<Option<&'a Language>>>(&self, language: P) -> Option<FontMetrics>;
+    fn get_metrics(&self, language: Option<&Language>) -> Option<FontMetrics>;
 }
 
 impl<O: IsA<Font>> FontExt for O {
     fn describe(&self) -> Option<FontDescription> {
         unsafe {
-            from_glib_full(ffi::pango_font_describe(self.as_ref().to_glib_none().0))
+            from_glib_full(pango_sys::pango_font_describe(
+                self.as_ref().to_glib_none().0,
+            ))
         }
     }
 
     fn describe_with_absolute_size(&self) -> Option<FontDescription> {
         unsafe {
-            from_glib_full(ffi::pango_font_describe_with_absolute_size(self.as_ref().to_glib_none().0))
+            from_glib_full(pango_sys::pango_font_describe_with_absolute_size(
+                self.as_ref().to_glib_none().0,
+            ))
         }
     }
 
     fn find_shaper(&self, language: &Language, ch: u32) -> Option<EngineShape> {
         unsafe {
-            from_glib_none(ffi::pango_font_find_shaper(self.as_ref().to_glib_none().0, mut_override(language.to_glib_none().0), ch))
+            from_glib_none(pango_sys::pango_font_find_shaper(
+                self.as_ref().to_glib_none().0,
+                mut_override(language.to_glib_none().0),
+                ch,
+            ))
         }
     }
 
     fn get_coverage(&self, language: &Language) -> Option<Coverage> {
         unsafe {
-            from_glib_full(ffi::pango_font_get_coverage(self.as_ref().to_glib_none().0, mut_override(language.to_glib_none().0)))
+            from_glib_full(pango_sys::pango_font_get_coverage(
+                self.as_ref().to_glib_none().0,
+                mut_override(language.to_glib_none().0),
+            ))
         }
     }
 
     fn get_font_map(&self) -> Option<FontMap> {
         unsafe {
-            from_glib_none(ffi::pango_font_get_font_map(self.as_ref().to_glib_none().0))
+            from_glib_none(pango_sys::pango_font_get_font_map(
+                self.as_ref().to_glib_none().0,
+            ))
         }
     }
 
@@ -76,15 +89,22 @@ impl<O: IsA<Font>> FontExt for O {
         unsafe {
             let mut ink_rect = Rectangle::uninitialized();
             let mut logical_rect = Rectangle::uninitialized();
-            ffi::pango_font_get_glyph_extents(self.as_ref().to_glib_none().0, glyph, ink_rect.to_glib_none_mut().0, logical_rect.to_glib_none_mut().0);
+            pango_sys::pango_font_get_glyph_extents(
+                self.as_ref().to_glib_none().0,
+                glyph,
+                ink_rect.to_glib_none_mut().0,
+                logical_rect.to_glib_none_mut().0,
+            );
             (ink_rect, logical_rect)
         }
     }
 
-    fn get_metrics<'a, P: Into<Option<&'a Language>>>(&self, language: P) -> Option<FontMetrics> {
-        let language = language.into();
+    fn get_metrics(&self, language: Option<&Language>) -> Option<FontMetrics> {
         unsafe {
-            from_glib_full(ffi::pango_font_get_metrics(self.as_ref().to_glib_none().0, mut_override(language.to_glib_none().0)))
+            from_glib_full(pango_sys::pango_font_get_metrics(
+                self.as_ref().to_glib_none().0,
+                mut_override(language.to_glib_none().0),
+            ))
         }
     }
 }
