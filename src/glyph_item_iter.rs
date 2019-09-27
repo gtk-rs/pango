@@ -4,6 +4,7 @@
 
 use glib::translate::*;
 use pango_sys;
+use std::marker::PhantomData;
 use GlyphItem;
 
 //Note: This type not exported
@@ -87,11 +88,14 @@ pub struct GlyphItemIteratorData {
     pub end_char: usize,
 }
 
-pub struct GlyphItemIterator<'a> {
+enum NormalIterator {}
+enum ReverseIterator {}
+
+struct GlyphItemIterator<'a, T> {
     item: &'a GlyphItem,
     text: &'a str,
-    is_reverse: bool,
     iter: Option<GlyphItemIter>,
+    _mode: PhantomData<T>,
 }
 
 impl GlyphItem {
@@ -99,11 +103,11 @@ impl GlyphItem {
         &'a self,
         text: &'a str,
     ) -> impl DoubleEndedIterator<Item = GlyphItemIteratorData> + 'a {
-        GlyphItemIterator {
+        GlyphItemIterator::<NormalIterator> {
             item: self,
             text,
-            is_reverse: false,
             iter: None,
+            _mode: PhantomData,
         }
     }
 
@@ -111,41 +115,27 @@ impl GlyphItem {
         &'a self,
         text: &'a str,
     ) -> impl DoubleEndedIterator<Item = GlyphItemIteratorData> + 'a {
-        GlyphItemIterator {
+        GlyphItemIterator::<ReverseIterator> {
             item: self,
             text,
-            is_reverse: true,
             iter: None,
+            _mode: PhantomData,
         }
     }
 }
 
-impl<'a> Iterator for GlyphItemIterator<'a> {
+impl<'a> Iterator for GlyphItemIterator<'a, NormalIterator> {
     type Item = GlyphItemIteratorData;
 
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(ref mut iter) = self.iter {
-            if self.is_reverse {
-                if iter.prev_cluster() {
-                    Some(iter.into_data())
-                } else {
-                    None
-                }
+            if iter.next_cluster() {
+                Some(iter.into_data())
             } else {
-                if iter.next_cluster() {
-                    Some(iter.into_data())
-                } else {
-                    None
-                }
+                None
             }
         } else {
-            let iter = unsafe {
-                if self.is_reverse {
-                    GlyphItemIter::init_end(self.item, self.text)
-                } else {
-                    GlyphItemIter::init_start(self.item, self.text)
-                }
-            };
+            let iter = unsafe { GlyphItemIter::init_start(self.item, self.text) };
             if let Some(iter) = iter {
                 let data = iter.into_data();
                 self.iter = Some(iter);
@@ -157,30 +147,18 @@ impl<'a> Iterator for GlyphItemIterator<'a> {
     }
 }
 
-impl<'a> DoubleEndedIterator for GlyphItemIterator<'a> {
-    fn next_back(&mut self) -> Option<Self::Item> {
+impl<'a> Iterator for GlyphItemIterator<'a, ReverseIterator> {
+    type Item = GlyphItemIteratorData;
+
+    fn next(&mut self) -> Option<Self::Item> {
         if let Some(ref mut iter) = self.iter {
-            if self.is_reverse {
-                if iter.next_cluster() {
-                    Some(iter.into_data())
-                } else {
-                    None
-                }
+            if iter.prev_cluster() {
+                Some(iter.into_data())
             } else {
-                if iter.prev_cluster() {
-                    Some(iter.into_data())
-                } else {
-                    None
-                }
+                None
             }
         } else {
-            let iter = unsafe {
-                if self.is_reverse {
-                    GlyphItemIter::init_start(self.item, self.text)
-                } else {
-                    GlyphItemIter::init_end(self.item, self.text)
-                }
-            };
+            let iter = unsafe { GlyphItemIter::init_end(self.item, self.text) };
             if let Some(iter) = iter {
                 let data = iter.into_data();
                 self.iter = Some(iter);
@@ -188,6 +166,42 @@ impl<'a> DoubleEndedIterator for GlyphItemIterator<'a> {
             } else {
                 None
             }
+        }
+    }
+}
+
+impl<'a> DoubleEndedIterator for GlyphItemIterator<'a, NormalIterator> {
+    fn next_back(&mut self) -> Option<Self::Item> {
+        if let Some(ref mut iter) = self.iter {
+            if iter.prev_cluster() {
+                Some(iter.into_data())
+            } else {
+                None
+            }
+        } else if let Some(iter) = unsafe { GlyphItemIter::init_end(self.item, self.text) } {
+            let data = iter.into_data();
+            self.iter = Some(iter);
+            Some(data)
+        } else {
+            None
+        }
+    }
+}
+
+impl<'a> DoubleEndedIterator for GlyphItemIterator<'a, ReverseIterator> {
+    fn next_back(&mut self) -> Option<Self::Item> {
+        if let Some(ref mut iter) = self.iter {
+            if iter.next_cluster() {
+                Some(iter.into_data())
+            } else {
+                None
+            }
+        } else if let Some(iter) = unsafe { GlyphItemIter::init_start(self.item, self.text) } {
+            let data = iter.into_data();
+            self.iter = Some(iter);
+            Some(data)
+        } else {
+            None
         }
     }
 }
