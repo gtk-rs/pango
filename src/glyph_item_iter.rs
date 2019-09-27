@@ -21,35 +21,31 @@ glib_wrapper! {
 }
 
 impl GlyphItemIter {
-    pub fn init_end(glyph_item: &GlyphItem, text: &str) -> Option<GlyphItemIter> {
-        unsafe {
-            let mut iter = GlyphItemIter::uninitialized();
-            let ret = from_glib(pango_sys::pango_glyph_item_iter_init_end(
-                iter.to_glib_none_mut().0,
-                mut_override(glyph_item.to_glib_none().0),
-                text.to_glib_none().0,
-            ));
-            if ret {
-                Some(iter)
-            } else {
-                None
-            }
+    pub(crate) unsafe fn init_end(glyph_item: &GlyphItem, text: &str) -> Option<GlyphItemIter> {
+        let mut iter = GlyphItemIter::uninitialized();
+        let ret = from_glib(pango_sys::pango_glyph_item_iter_init_end(
+            iter.to_glib_none_mut().0,
+            mut_override(glyph_item.to_glib_none().0),
+            text.to_glib_none().0,
+        ));
+        if ret {
+            Some(iter)
+        } else {
+            None
         }
     }
 
-    pub fn init_start(glyph_item: &GlyphItem, text: &str) -> Option<GlyphItemIter> {
-        unsafe {
-            let mut iter = GlyphItemIter::uninitialized();
-            let ret = from_glib(pango_sys::pango_glyph_item_iter_init_start(
-                iter.to_glib_none_mut().0,
-                mut_override(glyph_item.to_glib_none().0),
-                text.to_glib_none().0,
-            ));
-            if ret {
-                Some(iter)
-            } else {
-                None
-            }
+    pub(crate) unsafe fn init_start(glyph_item: &GlyphItem, text: &str) -> Option<GlyphItemIter> {
+        let mut iter = GlyphItemIter::uninitialized();
+        let ret = from_glib(pango_sys::pango_glyph_item_iter_init_start(
+            iter.to_glib_none_mut().0,
+            mut_override(glyph_item.to_glib_none().0),
+            text.to_glib_none().0,
+        ));
+        if ret {
+            Some(iter)
+        } else {
+            None
         }
     }
 
@@ -143,10 +139,12 @@ impl<'a> Iterator for GlyphItemIterator<'a> {
                 }
             }
         } else {
-            let iter = if self.is_reverse {
-                GlyphItemIter::init_end(self.item, self.text)
-            } else {
-                GlyphItemIter::init_start(self.item, self.text)
+            let iter = unsafe {
+                if self.is_reverse {
+                    GlyphItemIter::init_end(self.item, self.text)
+                } else {
+                    GlyphItemIter::init_start(self.item, self.text)
+                }
             };
             if let Some(iter) = iter {
                 let data = iter.into_data();
@@ -176,10 +174,12 @@ impl<'a> DoubleEndedIterator for GlyphItemIterator<'a> {
                 }
             }
         } else {
-            let iter = if self.is_reverse {
-                GlyphItemIter::init_start(self.item, self.text)
-            } else {
-                GlyphItemIter::init_end(self.item, self.text)
+            let iter = unsafe {
+                if self.is_reverse {
+                    GlyphItemIter::init_start(self.item, self.text)
+                } else {
+                    GlyphItemIter::init_end(self.item, self.text)
+                }
             };
             if let Some(iter) = iter {
                 let data = iter.into_data();
