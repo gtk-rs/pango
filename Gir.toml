@@ -210,8 +210,8 @@ status = "generate"
 
 [[object]]
 name = "Pango.GlyphItemIter"
-#need manual getters
-status = "manual"
+#need manual iterator implementation
+status = "ignored"
 
 [[object]]
 name = "Pango.Layout"

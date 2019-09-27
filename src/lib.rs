@@ -39,7 +39,6 @@ pub mod attribute;
 pub mod font_description;
 mod functions;
 mod glyph_item_iter;
-pub use glyph_item_iter::GlyphItemIter;
 pub mod gravity;
 pub mod item;
 pub mod language;
