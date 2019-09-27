@@ -107,7 +107,7 @@ impl GlyphItem {
         }
     }
 
-    pub fn riter<'a>(
+    pub fn reverse_iter<'a>(
         &'a self,
         text: &'a str,
     ) -> impl DoubleEndedIterator<Item = GlyphItemIteratorData> + 'a {
