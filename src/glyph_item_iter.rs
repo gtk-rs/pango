@@ -69,30 +69,6 @@ impl GlyphItemIter {
         }
     }
 
-    pub fn start_index(&self) -> i32 {
-        self.0.start_index
-    }
-
-    pub fn start_char(&self) -> i32 {
-        self.0.start_char
-    }
-
-    pub fn start_glyph(&self) -> i32 {
-        self.0.start_glyph
-    }
-
-    pub fn end_index(&self) -> i32 {
-        self.0.end_index
-    }
-
-    pub fn end_char(&self) -> i32 {
-        self.0.end_char
-    }
-
-    pub fn end_glyph(&self) -> i32 {
-        self.0.end_glyph
-    }
-
     pub fn into_data(&self) -> GlyphItemIteratorData {
         GlyphItemIteratorData {
             start_glyph: self.0.start_glyph,
@@ -122,41 +98,29 @@ pub struct GlyphItemIterator<'a> {
     iter: Option<GlyphItemIter>,
 }
 
-impl<'a> GlyphItemIterator<'a> {
-    #[inline(always)]
-    fn new_start(item: &'a GlyphItem, text: &'a str) -> GlyphItemIterator<'a> {
+impl GlyphItem {
+    pub fn iter<'a>(
+        &'a self,
+        text: &'a str,
+    ) -> impl DoubleEndedIterator<Item = GlyphItemIteratorData> + 'a {
         GlyphItemIterator {
-            item,
+            item: self,
             text,
             is_reverse: false,
             iter: None,
         }
     }
 
-    #[inline(always)]
-    fn new_end(item: &'a GlyphItem, text: &'a str) -> GlyphItemIterator<'a> {
-        GlyphItemIterator {
-            item,
-            text,
-            is_reverse: true,
-            iter: None,
-        }
-    }
-}
-
-impl GlyphItem {
-    pub fn iter<'a>(
-        &'a self,
-        text: &'a str,
-    ) -> impl DoubleEndedIterator<Item = GlyphItemIteratorData> + 'a {
-        GlyphItemIterator::new_start(self, text)
-    }
-
     pub fn riter<'a>(
         &'a self,
         text: &'a str,
     ) -> impl DoubleEndedIterator<Item = GlyphItemIteratorData> + 'a {
-        GlyphItemIterator::new_end(self, text)
+        GlyphItemIterator {
+            item: self,
+            text,
+            is_reverse: true,
+            iter: None,
+        }
     }
 }
 
