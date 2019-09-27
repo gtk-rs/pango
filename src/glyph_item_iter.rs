@@ -66,7 +66,7 @@ impl GlyphItemIter {
         }
     }
 
-    pub fn into_data(&self) -> GlyphItemIteratorData {
+    pub fn to_data(&self) -> GlyphItemIteratorData {
         GlyphItemIteratorData {
             start_glyph: self.0.start_glyph,
             end_glyph: self.0.end_glyph,
@@ -130,14 +130,14 @@ impl<'a> Iterator for GlyphItemIterator<'a, NormalIterator> {
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(ref mut iter) = self.iter {
             if iter.next_cluster() {
-                Some(iter.into_data())
+                Some(iter.to_data())
             } else {
                 None
             }
         } else {
             let iter = unsafe { GlyphItemIter::init_start(self.item, self.text) };
             if let Some(iter) = iter {
-                let data = iter.into_data();
+                let data = iter.to_data();
                 self.iter = Some(iter);
                 Some(data)
             } else {
@@ -153,14 +153,14 @@ impl<'a> Iterator for GlyphItemIterator<'a, ReverseIterator> {
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(ref mut iter) = self.iter {
             if iter.prev_cluster() {
-                Some(iter.into_data())
+                Some(iter.to_data())
             } else {
                 None
             }
         } else {
             let iter = unsafe { GlyphItemIter::init_end(self.item, self.text) };
             if let Some(iter) = iter {
-                let data = iter.into_data();
+                let data = iter.to_data();
                 self.iter = Some(iter);
                 Some(data)
             } else {
@@ -174,12 +174,12 @@ impl<'a> DoubleEndedIterator for GlyphItemIterator<'a, NormalIterator> {
     fn next_back(&mut self) -> Option<Self::Item> {
         if let Some(ref mut iter) = self.iter {
             if iter.prev_cluster() {
-                Some(iter.into_data())
+                Some(iter.to_data())
             } else {
                 None
             }
         } else if let Some(iter) = unsafe { GlyphItemIter::init_end(self.item, self.text) } {
-            let data = iter.into_data();
+            let data = iter.to_data();
             self.iter = Some(iter);
             Some(data)
         } else {
@@ -192,12 +192,12 @@ impl<'a> DoubleEndedIterator for GlyphItemIterator<'a, ReverseIterator> {
     fn next_back(&mut self) -> Option<Self::Item> {
         if let Some(ref mut iter) = self.iter {
             if iter.next_cluster() {
-                Some(iter.into_data())
+                Some(iter.to_data())
             } else {
                 None
             }
         } else if let Some(iter) = unsafe { GlyphItemIter::init_start(self.item, self.text) } {
-            let data = iter.into_data();
+            let data = iter.to_data();
             self.iter = Some(iter);
             Some(data)
         } else {
