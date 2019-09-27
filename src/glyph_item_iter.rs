@@ -68,8 +68,8 @@ impl GlyphItemIter {
 
     pub fn to_data(&self) -> GlyphItemIteratorData {
         GlyphItemIteratorData {
-            start_glyph: self.0.start_glyph,
-            end_glyph: self.0.end_glyph,
+            start_glyph: self.0.start_glyph as usize,
+            end_glyph: self.0.end_glyph as usize,
             start_index: self.0.start_index as usize,
             end_index: self.0.end_index as usize,
             start_char: self.0.start_char as usize,
@@ -79,11 +79,11 @@ impl GlyphItemIter {
 }
 
 pub struct GlyphItemIteratorData {
-    pub start_glyph: i32,
+    pub start_glyph: usize,
     pub start_index: usize,
     pub start_char: usize,
 
-    pub end_glyph: i32,
+    pub end_glyph: usize,
     pub end_index: usize,
     pub end_char: usize,
 }
