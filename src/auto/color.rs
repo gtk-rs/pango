@@ -31,6 +31,18 @@ impl Color {
     fn to_string(&self) -> GString {
         unsafe { from_glib_full(pango_sys::pango_color_to_string(self.to_glib_none().0)) }
     }
+
+    pub fn red(&self) -> u16 {
+        self.0.red
+    }
+
+    pub fn green(&self) -> u16 {
+        self.0.green
+    }
+
+    pub fn blue(&self) -> u16 {
+        self.0.blue
+    }
 }
 
 impl fmt::Display for Color {

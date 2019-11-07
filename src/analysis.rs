@@ -4,12 +4,14 @@
 
 use glib::translate::*;
 use pango_sys;
+use Color;
 use EngineLang;
 use EngineShape;
 use Font;
 use Gravity;
 use Language;
 use Script;
+use pango_sys::{PangoAttribute, PangoAttrColor, PangoColor};
 
 #[repr(C)]
 pub struct Analysis(pango_sys::PangoAnalysis);
@@ -47,9 +49,27 @@ impl Analysis {
         unsafe { from_glib_none(self.0.language) }
     }
 
-    /*pub fn extra_attrs(&self) -> Vec<LogAttr> {
-        unsafe { from_glib_none_num_as_vec(self.0.extra_attrs) }
-    }*/
+    pub fn color(&self) -> Option<Color> {
+        unsafe {
+            let mut attrs = self.0.extra_attrs;
+            while !attrs.is_null() {
+                let attr = (*attrs).data as *mut PangoAttribute;
+                match attr.as_ref() {
+                    Some(attr) => {
+                        if (*attr.klass).type_ == pango_sys::PANGO_ATTR_FOREGROUND {
+                            let attr_color = std::mem::transmute::<*const PangoAttribute, *const PangoAttrColor>(attr);
+                            let y: *const PangoColor = &(*attr_color).color;
+                            let color: Option<Color> = from_glib_none(y);
+                            return color;
+                        }
+                    },
+                    None => break,
+                }
+                attrs = (*attrs).next;
+            }
+            None
+        }
+    }
 }
 
 #[doc(hidden)]
