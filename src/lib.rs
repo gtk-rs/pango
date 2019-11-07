@@ -31,6 +31,8 @@ pub mod analysis;
 pub use analysis::Analysis;
 pub mod attr_class;
 pub use attr_class::AttrClass;
+pub mod attr_color;
+pub use attr_color::AttrColor;
 pub mod attr_iterator;
 pub mod attr_list;
 pub mod attribute;

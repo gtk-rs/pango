@@ -10,7 +10,6 @@ single_version_file = true
 deprecate_by_min_version = true
 
 generate = [
-    # "Pango.AttrColor",
     # "Pango.AttrFloat",
     # "Pango.AttrFontDesc",
     # "Pango.AttrFontFeatures",
@@ -72,6 +71,7 @@ manual = [
     "GLib.Error",
     "Pango.Analysis",
     "Pango.AttrClass",
+    "Pango.AttrColor",
     "Pango.Language",
     "Pango.Rectangle",
 ]

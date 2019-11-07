@@ -2,6 +2,8 @@
 // See the COPYRIGHT file at the top-level directory of this distribution.
 // Licensed under the MIT license, see the LICENSE file or <http://opensource.org/licenses/MIT>
 
+use AttrType;
+use glib::translate::from_glib;
 use glib::translate::{FromGlibPtrFull, FromGlibPtrNone, Stash, ToGlibPtr};
 use pango_sys;
 
@@ -46,7 +48,14 @@ impl FromGlibPtrFull<*const pango_sys::PangoAttrClass> for AttrClass {
     }
 }
 
+#[derive(Debug)]
 pub struct AttrClass(*mut pango_sys::PangoAttrClass);
+
+impl AttrClass {
+    pub fn get_type(&self) -> AttrType {
+        unsafe{ from_glib((*self.0).type_) }
+    }
+}
 
 impl PartialEq for AttrClass {
     fn eq(&self, other: &AttrClass) -> bool {
