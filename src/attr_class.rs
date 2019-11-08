@@ -53,7 +53,7 @@ pub struct AttrClass(*mut pango_sys::PangoAttrClass);
 
 impl AttrClass {
     pub fn get_type(&self) -> AttrType {
-        unsafe{ from_glib((*self.0).type_) }
+        unsafe { from_glib((*self.0).type_) }
     }
 }
 

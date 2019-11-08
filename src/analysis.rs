@@ -11,7 +11,6 @@ use Font;
 use Gravity;
 use Language;
 use Script;
-use pango_sys::{PangoAttribute, PangoAttrColor, PangoColor};
 
 #[repr(C)]
 pub struct Analysis(pango_sys::PangoAnalysis);

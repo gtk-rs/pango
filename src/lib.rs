@@ -36,6 +36,7 @@ pub use attr_color::AttrColor;
 pub mod attr_iterator;
 pub mod attr_list;
 pub mod attribute;
+pub mod color;
 pub mod font_description;
 mod functions;
 pub mod gravity;
