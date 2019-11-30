@@ -49,9 +49,7 @@ impl Analysis {
     }
 
     pub fn extra_attrs(&self) -> Vec<Attribute> {
-        unsafe {
-            FromGlibPtrContainer::from_glib_none(self.0.extra_attrs)
-        }
+        unsafe { FromGlibPtrContainer::from_glib_none(self.0.extra_attrs) }
     }
 }
 

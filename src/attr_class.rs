@@ -2,10 +2,10 @@
 // See the COPYRIGHT file at the top-level directory of this distribution.
 // Licensed under the MIT license, see the LICENSE file or <http://opensource.org/licenses/MIT>
 
-use AttrType;
 use glib::translate::from_glib;
 use glib::translate::{FromGlibPtrFull, FromGlibPtrNone, Stash, ToGlibPtr};
 use pango_sys;
+use AttrType;
 
 #[doc(hidden)]
 impl<'a> ToGlibPtr<'a, *mut pango_sys::PangoAttrClass> for &'a AttrClass {
