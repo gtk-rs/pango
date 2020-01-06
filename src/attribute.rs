@@ -1,18 +1,22 @@
 // Copyright 2017, The Gtk-rs Project Developers.
 // See the COPYRIGHT file at the top-level directory of this distribution.
-// Licensed under the MIT license, see the LICENSE file or <http://opensource.org/licenses/MIT>
+// Licensed under the MIT license, see the LICENSE file or <http://opensource.org/licenses/MIT> 
 
-use glib::translate::*;
-use pango_sys;
 use AttrClass;
 use Attribute;
+use FontDescription;
 use Gravity;
 use GravityHint;
+use Language;
+use Rectangle;
 use Stretch;
 use Style;
 use Underline;
-use Variant;
 use Weight;
+
+use glib::translate::from_glib_full;
+use glib::translate::ToGlib;
+use glib::translate::ToGlibPtr;
 
 impl Attribute {
     #[cfg(any(feature = "v1_38", feature = "dox"))]
@@ -32,8 +36,52 @@ impl Attribute {
         }
     }
 
+    // TODO: available at 1.44
+    // pub fn new_allow_breaks(allow_breaks: bool) -> Option<Attribute> {
+    //     unsafe {
+    //         from_glib_full(pango_sys::pango_attr_allow_breaks_new(
+    //             allow_breaks.to_glib(),
+    //         ))
+    //     }
+    // }
+
+    // TODO: available at 1.44
+    // pub fn new_insert_hyphens(insert_hyphens: bool) -> Option<Attribute> {
+    //     unsafe {
+    //         from_glib_full(pango_sys::pango_attr_insert_hyphens_new(
+    //             insert_hyphens.to_glib(),
+    //         ))
+    //     }
+    // }
+
+    // TODO: available at 1.44, needs PangoShowFlags
+    // pub fn new_show(flags: PangoShowFlags) -> Option<Attribute> {
+    //     unsafe {
+    //         from_glib_full(pango_sys::pango_attr_show_new(
+    //             flags.to_glib(),
+    //         ))
+    //     }
+    // }
+
+    pub fn new_language(language: &Language) -> Option<Attribute> {
+        unsafe {
+            from_glib_full(pango_sys::pango_attr_language_new(
+                language.to_glib_none().0,
+            ))
+        }
+    }
+
     pub fn new_family(family: &str) -> Option<Attribute> {
         unsafe { from_glib_full(pango_sys::pango_attr_family_new(family.to_glib_none().0)) }
+    }
+
+    #[cfg(any(feature = "v1_38", feature = "dox"))]
+    pub fn new_font_features(features: &str) -> Option<Attribute> {
+        unsafe {
+            from_glib_full(pango_sys::pango_attr_font_features_new(
+                features.to_glib_none().0,
+            ))
+        }
     }
 
     #[cfg(any(feature = "v1_38", feature = "dox"))]
@@ -61,16 +109,32 @@ impl Attribute {
         unsafe { from_glib_full(pango_sys::pango_attr_rise_new(rise)) }
     }
 
-    pub fn new_scale(scale_factor: f64) -> Option<Attribute> {
-        unsafe { from_glib_full(pango_sys::pango_attr_scale_new(scale_factor)) }
-    }
-
     pub fn new_size(size: i32) -> Option<Attribute> {
         unsafe { from_glib_full(pango_sys::pango_attr_size_new(size)) }
     }
 
-    pub fn new_size_absolute(size: i32) -> Option<Attribute> {
+    pub fn new_absolute_size(size: i32) -> Option<Attribute> {
         unsafe { from_glib_full(pango_sys::pango_attr_size_new_absolute(size)) }
+    }
+
+    pub fn new_font_desc(desc: &FontDescription) -> Option<Attribute> {
+        unsafe { from_glib_full(pango_sys::pango_attr_font_desc_new(desc.to_glib_none().0)) }
+    }
+
+    pub fn new_shape(
+        ink_rect: &Rectangle,
+        logical_rect: &Rectangle,
+    ) -> Option<Attribute> {
+        unsafe {
+            from_glib_full(pango_sys::pango_attr_shape_new(
+                ink_rect.to_glib_none().0,
+                logical_rect.to_glib_none().0,
+            ))
+        }
+    }
+
+    pub fn new_scale(scale_factor: f64) -> Option<Attribute> {
+        unsafe { from_glib_full(pango_sys::pango_attr_scale_new(scale_factor)) }
     }
 
     pub fn new_stretch(stretch: Stretch) -> Option<Attribute> {
@@ -105,9 +169,9 @@ impl Attribute {
         unsafe { from_glib_full(pango_sys::pango_attr_underline_new(underline.to_glib())) }
     }
 
-    pub fn new_variant(variant: Variant) -> Option<Attribute> {
+    /*pub fn attr_variant_new(variant: Variant) -> Option<Attribute> {
         unsafe { from_glib_full(pango_sys::pango_attr_variant_new(variant.to_glib())) }
-    }
+    }*/
 
     pub fn new_weight(weight: Weight) -> Option<Attribute> {
         unsafe { from_glib_full(pango_sys::pango_attr_weight_new(weight.to_glib())) }
@@ -117,13 +181,6 @@ impl Attribute {
         unsafe { from_glib_full((*self.to_glib_none().0).klass) }
     }
 
-    pub fn get_start_index(&self) -> u32 {
-        unsafe {
-            let stash = self.to_glib_none();
-            (*stash.0).start_index
-        }
-    }
-
     pub fn get_end_index(&self) -> u32 {
         unsafe {
             let stash = self.to_glib_none();
@@ -131,17 +188,24 @@ impl Attribute {
         }
     }
 
-    pub fn set_start_index(&mut self, index: u32) {
-        unsafe {
-            let stash = self.to_glib_none_mut();
-            (*stash.0).start_index = index;
-        }
-    }
-
     pub fn set_end_index(&mut self, index: u32) {
         unsafe {
             let stash = self.to_glib_none_mut();
             (*stash.0).end_index = index;
+        }
+    }
+
+    pub fn get_start_index(&self) -> u32 {
+        unsafe {
+            let stash = self.to_glib_none();
+            (*stash.0).start_index
+        }
+    }
+
+    pub fn set_start_index(&mut self, index: u32) {
+        unsafe {
+            let stash = self.to_glib_none_mut();
+            (*stash.0).start_index = index;
         }
     }
 }

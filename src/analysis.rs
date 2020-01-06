@@ -4,6 +4,7 @@
 
 use glib::translate::*;
 use pango_sys;
+use Attribute;
 use EngineLang;
 use EngineShape;
 use Font;
@@ -47,9 +48,9 @@ impl Analysis {
         unsafe { from_glib_none(self.0.language) }
     }
 
-    /*pub fn extra_attrs(&self) -> Vec<LogAttr> {
-        unsafe { from_glib_none_num_as_vec(self.0.extra_attrs) }
-    }*/
+    pub fn extra_attrs(&self) -> Vec<Attribute> {
+        unsafe { FromGlibPtrContainer::from_glib_none(self.0.extra_attrs) }
+    }
 }
 
 #[doc(hidden)]
