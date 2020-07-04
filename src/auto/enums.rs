@@ -14,6 +14,7 @@ use pango_sys;
 use std::fmt;
 
 #[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
+#[non_exhaustive]
 pub enum Alignment {
     Left,
     Center,
@@ -88,6 +89,7 @@ impl SetValue for Alignment {
 }
 
 #[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
+#[non_exhaustive]
 pub enum AttrType {
     Invalid,
     Language,
@@ -115,6 +117,9 @@ pub enum AttrType {
     FontFeatures,
     ForegroundAlpha,
     BackgroundAlpha,
+    AllowBreaks,
+    Show,
+    InsertHyphens,
     #[doc(hidden)]
     __Unknown(i32),
 }
@@ -151,6 +156,9 @@ impl fmt::Display for AttrType {
                 AttrType::FontFeatures => "FontFeatures",
                 AttrType::ForegroundAlpha => "ForegroundAlpha",
                 AttrType::BackgroundAlpha => "BackgroundAlpha",
+                AttrType::AllowBreaks => "AllowBreaks",
+                AttrType::Show => "Show",
+                AttrType::InsertHyphens => "InsertHyphens",
                 _ => "Unknown",
             }
         )
@@ -189,6 +197,9 @@ impl ToGlib for AttrType {
             AttrType::FontFeatures => pango_sys::PANGO_ATTR_FONT_FEATURES,
             AttrType::ForegroundAlpha => pango_sys::PANGO_ATTR_FOREGROUND_ALPHA,
             AttrType::BackgroundAlpha => pango_sys::PANGO_ATTR_BACKGROUND_ALPHA,
+            AttrType::AllowBreaks => pango_sys::PANGO_ATTR_ALLOW_BREAKS,
+            AttrType::Show => pango_sys::PANGO_ATTR_SHOW,
+            AttrType::InsertHyphens => pango_sys::PANGO_ATTR_INSERT_HYPHENS,
             AttrType::__Unknown(value) => value,
         }
     }
@@ -224,6 +235,9 @@ impl FromGlib<pango_sys::PangoAttrType> for AttrType {
             23 => AttrType::FontFeatures,
             24 => AttrType::ForegroundAlpha,
             25 => AttrType::BackgroundAlpha,
+            26 => AttrType::AllowBreaks,
+            27 => AttrType::Show,
+            28 => AttrType::InsertHyphens,
             value => AttrType::__Unknown(value),
         }
     }
@@ -253,7 +267,9 @@ impl SetValue for AttrType {
     }
 }
 
+#[cfg_attr(feature = "v1_44", deprecated)]
 #[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
+#[non_exhaustive]
 pub enum BidiType {
     L,
     Lre,
@@ -278,6 +294,7 @@ pub enum BidiType {
     __Unknown(i32),
 }
 
+#[cfg_attr(feature = "v1_44", deprecated)]
 impl fmt::Display for BidiType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
@@ -309,6 +326,7 @@ impl fmt::Display for BidiType {
     }
 }
 
+#[cfg_attr(feature = "v1_44", deprecated)]
 #[doc(hidden)]
 impl ToGlib for BidiType {
     type GlibType = pango_sys::PangoBidiType;
@@ -339,6 +357,7 @@ impl ToGlib for BidiType {
     }
 }
 
+#[cfg_attr(feature = "v1_44", deprecated)]
 #[doc(hidden)]
 impl FromGlib<pango_sys::PangoBidiType> for BidiType {
     fn from_glib(value: pango_sys::PangoBidiType) -> Self {
@@ -367,24 +386,28 @@ impl FromGlib<pango_sys::PangoBidiType> for BidiType {
     }
 }
 
+#[cfg_attr(feature = "v1_44", deprecated)]
 impl StaticType for BidiType {
     fn static_type() -> Type {
         unsafe { from_glib(pango_sys::pango_bidi_type_get_type()) }
     }
 }
 
+#[cfg_attr(feature = "v1_44", deprecated)]
 impl<'a> FromValueOptional<'a> for BidiType {
     unsafe fn from_value_optional(value: &Value) -> Option<Self> {
         Some(FromValue::from_value(value))
     }
 }
 
+#[cfg_attr(feature = "v1_44", deprecated)]
 impl<'a> FromValue<'a> for BidiType {
     unsafe fn from_value(value: &Value) -> Self {
         from_glib(gobject_sys::g_value_get_enum(value.to_glib_none().0))
     }
 }
 
+#[cfg_attr(feature = "v1_44", deprecated)]
 impl SetValue for BidiType {
     unsafe fn set_value(value: &mut Value, this: &Self) {
         gobject_sys::g_value_set_enum(value.to_glib_none_mut().0, this.to_glib())
@@ -392,6 +415,7 @@ impl SetValue for BidiType {
 }
 
 #[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
+#[non_exhaustive]
 pub enum CoverageLevel {
     None,
     Fallback,
@@ -470,6 +494,7 @@ impl SetValue for CoverageLevel {
 }
 
 #[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
+#[non_exhaustive]
 pub enum Direction {
     Ltr,
     Rtl,
@@ -560,6 +585,7 @@ impl SetValue for Direction {
 }
 
 #[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
+#[non_exhaustive]
 pub enum EllipsizeMode {
     None,
     Start,
@@ -638,6 +664,7 @@ impl SetValue for EllipsizeMode {
 }
 
 #[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
+#[non_exhaustive]
 pub enum Gravity {
     South,
     East,
@@ -720,6 +747,7 @@ impl SetValue for Gravity {
 }
 
 #[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
+#[non_exhaustive]
 pub enum GravityHint {
     Natural,
     Strong,
@@ -794,6 +822,7 @@ impl SetValue for GravityHint {
 }
 
 #[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
+#[non_exhaustive]
 pub enum RenderPart {
     Foreground,
     Background,
@@ -872,6 +901,7 @@ impl SetValue for RenderPart {
 }
 
 #[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
+#[non_exhaustive]
 pub enum Script {
     InvalidCode,
     Common,
@@ -1406,6 +1436,7 @@ impl SetValue for Script {
 }
 
 #[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
+#[non_exhaustive]
 pub enum Stretch {
     UltraCondensed,
     ExtraCondensed,
@@ -1504,6 +1535,7 @@ impl SetValue for Stretch {
 }
 
 #[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
+#[non_exhaustive]
 pub enum Style {
     Normal,
     Oblique,
@@ -1578,6 +1610,7 @@ impl SetValue for Style {
 }
 
 #[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
+#[non_exhaustive]
 pub enum TabAlign {
     Left,
     #[doc(hidden)]
@@ -1644,6 +1677,7 @@ impl SetValue for TabAlign {
 }
 
 #[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
+#[non_exhaustive]
 pub enum Underline {
     None,
     Single,
@@ -1726,6 +1760,7 @@ impl SetValue for Underline {
 }
 
 #[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
+#[non_exhaustive]
 pub enum Variant {
     Normal,
     SmallCaps,
@@ -1796,6 +1831,7 @@ impl SetValue for Variant {
 }
 
 #[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
+#[non_exhaustive]
 pub enum Weight {
     Thin,
     Ultralight,
@@ -1906,6 +1942,7 @@ impl SetValue for Weight {
 }
 
 #[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
+#[non_exhaustive]
 pub enum WrapMode {
     Word,
     Char,

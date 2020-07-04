@@ -21,6 +21,7 @@ travis-ci = { repository = "gtk-rs/pango" }
 v1_38 = ["pango-sys/v1_38"]
 v1_40 = ["v1_38"]
 v1_42 = ["v1_40", "pango-sys/v1_42"]
+v1_44 = ["v1_42", "pango-sys/v1_44"]
 dox = ["pango-sys/dox", "glib/dox"]
 purge-lgpl-docs = ["gtk-rs-lgpl-docs"]
 embed-lgpl-docs = ["gtk-rs-lgpl-docs"]
@@ -29,7 +30,7 @@ embed-lgpl-docs = ["gtk-rs-lgpl-docs"]
 features = ["dox", "embed-lgpl-docs"]
 
 [build-dependencies.gtk-rs-lgpl-docs]
-version = "0.1.3"
+version = "0.1"
 optional = true
 
 [dependencies]
@@ -39,7 +40,7 @@ glib-sys = "0.9.1"
 pango-sys = "0.9.1"
 libc = "0.2"
 bitflags = "1.0"
-lazy_static = "1.0"
+once_cell = "1.0"
 
 [dev-dependencies]
 gir-format-check = "^0.1"
