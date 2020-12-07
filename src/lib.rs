@@ -54,6 +54,7 @@ pub mod attr_iterator;
 pub mod attr_list;
 pub mod attribute;
 mod functions;
+mod glyph_item_iter;
 pub mod gravity;
 pub mod item;
 pub mod language;

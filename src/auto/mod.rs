@@ -62,9 +62,6 @@ pub use self::font_metrics::FontMetrics;
 mod glyph_item;
 pub use self::glyph_item::GlyphItem;
 
-mod glyph_item_iter;
-pub use self::glyph_item_iter::GlyphItemIter;
-
 mod glyph_string;
 pub use self::glyph_string::GlyphString;
 

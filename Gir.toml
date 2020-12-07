@@ -44,7 +44,6 @@ generate = [
     "Pango.FontsetSimple",
     "Pango.Glyph",
     "Pango.GlyphItem",
-    "Pango.GlyphItemIter",
     "Pango.GlyphString",
     "Pango.GlyphUnit",
     "Pango.Gravity",
@@ -220,6 +219,11 @@ status = "generate"
         [[object.function.parameter]]
         name = "language"
         const = true
+
+[[object]]
+name = "Pango.GlyphItemIter"
+#need manual iterator implementation
+status = "ignored"
 
 [[object]]
 name = "Pango.Layout"
